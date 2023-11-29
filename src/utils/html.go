@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func GetHTMLFilesFromDir(path string) []string {
-	files, err := os.ReadDir(path)
+func GetHTMLFilesFromDir(dir string) []string {
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		fmt.Printf("Error reading directory (GetHTMLFilesFromDir): %s\n", err)
 		return nil
@@ -17,7 +17,7 @@ func GetHTMLFilesFromDir(path string) []string {
 	var htmlFiles []string
 	for _, file := range files {
 		if !file.IsDir() && strings.HasSuffix(file.Name(), ".html") {
-			htmlFiles = append(htmlFiles, filepath.Join(path, file.Name()))
+			htmlFiles = append(htmlFiles, filepath.Join(dir, file.Name()))
 		}
 	}
 
