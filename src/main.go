@@ -40,7 +40,7 @@ func main() {
 			},
 		}
 
-		c.HTML(http.StatusNotFound, "index.html", gin.H{
+		c.HTML(http.StatusOK, "index.html", gin.H{
 			"Title":   "My Title",
 			"Content": "Hello world!",
 			"Texts":   texts,
