@@ -17,9 +17,7 @@ func main() {
 
 	pages := utils.GetHTMLFilesFromDir("./src/pages")
 	components := utils.GetHTMLFilesFromDir("./src/components")
-	asd := utils.GetHTMLFilesFromDir("./src/public")
 	files := append(pages, components...)
-	files = append(files, asd...)
 	r.LoadHTMLFiles(files...)
 
 	r.Use(utils.Cors("*", "POST,HEAD,PATCH,OPTIONS,GET,PUT"))
@@ -54,11 +52,7 @@ func main() {
 
 		for _, path := range pages {
 			file := strings.Replace(path, "src\\pages\\", "", 1)
-
-			if request == file {
-				c.File(path)
-				return
-			} else if request+".html" == file {
+			if request+".html" == file {
 				c.File(path)
 				return
 			}
