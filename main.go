@@ -53,6 +53,7 @@ func main() {
 		for _, path := range pages {
 			file := strings.Replace(path, "src\\pages\\", "", 1)
 			if request+".html" == file {
+				ctx.Writer.WriteHeader(http.StatusOK)
 				ctx.File(path)
 				return
 			}
