@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"main/src/utils"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -12,18 +13,20 @@ import (
 func main() {
 	godotenv.Load()
 
-	router := gin.Default()
+	r := gin.Default()
 
 	pages := utils.GetHTMLFilesFromDir("./src/pages")
 	components := utils.GetHTMLFilesFromDir("./src/components")
+	asd := utils.GetHTMLFilesFromDir("./src/public")
 	files := append(pages, components...)
-	router.LoadHTMLFiles(files...)
+	files = append(files, asd...)
+	r.LoadHTMLFiles(files...)
 
-	router.Use(utils.Cors("*", "POST,HEAD,PATCH,OPTIONS,GET,PUT"))
+	r.Use(utils.Cors("*", "POST,HEAD,PATCH,OPTIONS,GET,PUT"))
 
-	router.Static("/assets", "./src/assets")
+	r.Static("/assets", "./sc/assets")
 
-	router.GET("/", func(ctx *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		texts := []map[string]interface{}{
 			{
 				"Title":   "Title 1",
@@ -39,18 +42,33 @@ func main() {
 			},
 		}
 
-		ctx.HTML(http.StatusNotFound, "index.html", gin.H{
+		c.HTML(http.StatusNotFound, "index.html", gin.H{
 			"Title":   "My Title",
 			"Content": "Hello world!",
 			"Texts":   texts,
 		})
 	})
 
-	router.NoRoute(func(ctx *gin.Context) {
-		ctx.HTML(http.StatusNotFound, "404.html", gin.H{})
+	r.NoRoute(func(c *gin.Context) {
+		request := strings.Replace(c.Request.URL.Path, "/", "", 1)
+
+		for _, path := range pages {
+			file := strings.Replace(path, "src\\pages\\", "", 1)
+
+			if request == file {
+				c.File(path)
+				return
+			} else if request+".html" == file {
+				c.File(path)
+				return
+			}
+		}
+
+		c.Writer.WriteHeader(http.StatusNotFound)
+		c.File("./src/pages/404.html")
 	})
 
 	PORT := utils.GetEnvOrDefault("PORT", "3000")
 	HOST := utils.GetEnvOrDefault("HOST", "127.0.0.1")
-	router.Run(fmt.Sprintf("%s:%s", HOST, PORT))
+	r.Run(fmt.Sprintf("%s:%s", HOST, PORT))
 }
