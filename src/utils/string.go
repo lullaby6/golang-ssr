@@ -14,6 +14,14 @@ func JoinStringWithCallback(strings []string, callback func(string) string) stri
 	return result
 }
 
+func JoinMapListWithCallback(data []map[string]interface{}, callback func(map[string]interface{}) string) string {
+	var result string
+	for _, item := range data {
+		result += callback(item)
+	}
+	return result
+}
+
 func ParseString(templateString string, props map[string]interface{}) string {
 	template, err := template.New("index").Parse(string(templateString))
 	if err != nil {
