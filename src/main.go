@@ -13,18 +13,18 @@ import (
 func main() {
 	godotenv.Load()
 
-	r := gin.Default()
+	router := gin.Default()
 
 	pages := utils.GetHTMLFilesFromDir("./src/pages")
 	components := utils.GetHTMLFilesFromDir("./src/components")
 	files := append(pages, components...)
-	r.LoadHTMLFiles(files...)
+	router.LoadHTMLFiles(files...)
 
-	r.Use(utils.Cors("*", "POST,HEAD,PATCH,OPTIONS,GET,PUT"))
+	router.Use(utils.Cors("*", "POST,HEAD,PATCH,OPTIONS,GET,PUT"))
 
-	r.Static("/assets", "./sc/assets")
+	router.Static("/assets", "./src/assets")
 
-	r.GET("/", func(c *gin.Context) {
+	router.GET("/", func(ctx *gin.Context) {
 		texts := []map[string]interface{}{
 			{
 				"Title":   "Title 1",
@@ -40,29 +40,29 @@ func main() {
 			},
 		}
 
-		c.HTML(http.StatusOK, "index.html", gin.H{
+		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"Title":   "My Title",
 			"Content": "Hello world!",
 			"Texts":   texts,
 		})
 	})
 
-	r.NoRoute(func(c *gin.Context) {
-		request := strings.Replace(c.Request.URL.Path, "/", "", 1)
+	router.NoRoute(func(ctx *gin.Context) {
+		request := strings.Replace(ctx.Request.URL.Path, "/", "", 1)
 
 		for _, path := range pages {
 			file := strings.Replace(path, "src\\pages\\", "", 1)
 			if request+".html" == file {
-				c.File(path)
+				ctx.File(path)
 				return
 			}
 		}
 
-		c.Writer.WriteHeader(http.StatusNotFound)
-		c.File("./src/pages/404.html")
+		ctx.Writer.WriteHeader(http.StatusNotFound)
+		ctx.File("./src/pages/404.html")
 	})
 
 	PORT := utils.GetEnvOrDefault("PORT", "3000")
 	HOST := utils.GetEnvOrDefault("HOST", "127.0.0.1")
-	r.Run(fmt.Sprintf("%s:%s", HOST, PORT))
+	router.Run(fmt.Sprintf("%s:%s", HOST, PORT))
 }
