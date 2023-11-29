@@ -17,19 +17,18 @@ func JoinStringWithCallback(strings []string, callback func(string) string) stri
 func ParseString(templateString string, props map[string]interface{}) string {
 	template, err := template.New("index").Parse(string(templateString))
 	if err != nil {
-		fmt.Printf("Error parsing template (ParseHTML): %s\n", err)
+		fmt.Printf("Error parsing template (ParseString): %s\n", err)
 		return ""
 	}
 
-	var resultHTML bytes.Buffer
-
-	err = template.ExecuteTemplate(&resultHTML, "index", props)
+	var templateResult bytes.Buffer
+	err = template.ExecuteTemplate(&templateResult, "index", props)
 	if err != nil {
-		fmt.Printf("Error executing template (ParseHTML): %s\n", err)
+		fmt.Printf("Error executing template (ParseString): %s\n", err)
 		return ""
 	}
 
-	resultHTMLBytes := resultHTML.String()
+	result := templateResult.String()
 
-	return resultHTMLBytes
+	return result
 }
