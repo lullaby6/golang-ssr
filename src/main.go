@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"main/src/components"
 	"main/src/utils"
 	"net/http"
 
@@ -15,6 +14,11 @@ func main() {
 
 	router := gin.Default()
 
+	pages := utils.GetHTMLFilesFromDir("./src/pages")
+	components := utils.GetHTMLFilesFromDir("./src/components")
+	files := append(pages, components...)
+	router.LoadHTMLFiles(files...)
+
 	router.Use(utils.Cors("*", "POST,HEAD,PATCH,OPTIONS,GET,PUT"))
 
 	router.Static("/assets", "./src/assets")
@@ -22,38 +26,28 @@ func main() {
 	router.GET("/", func(ctx *gin.Context) {
 		texts := []map[string]interface{}{
 			{
-				"Text": "Hello",
+				"Title":   "Title 1",
+				"Content": "Content 1",
 			},
 			{
-				"Text": "World",
+				"Title":   "Title 2",
+				"Content": "Content 2",
+			},
+			{
+				"Title":   "Title 3",
+				"Content": "Content 3",
 			},
 		}
 
-		textsComponent := utils.JoinMapListWithCallback(texts, components.Text)
-
-		props := map[string]interface{}{
+		ctx.HTML(http.StatusNotFound, "index.html", gin.H{
 			"Title":   "My Title",
 			"Content": "Hello world!",
-			"Texts":   textsComponent,
-		}
-
-		html, err := utils.ParseHTML("./src/pages/index.html", props)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		ctx.Data(http.StatusOK, "text/html; charset=utf-8", html)
+			"Texts":   texts,
+		})
 	})
 
 	router.NoRoute(func(ctx *gin.Context) {
-		html, err := utils.GetHTML("./src/pages/404.html")
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		ctx.Data(http.StatusNotFound, "text/html; charset=utf-8", html)
+		ctx.HTML(http.StatusNotFound, "404.html", gin.H{})
 	})
 
 	PORT := utils.GetEnvOrDefault("PORT", "3000")

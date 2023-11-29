@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 func GetHTML(path string) ([]byte, error) {
@@ -42,4 +44,21 @@ func ParseHTML(path string, props map[string]interface{}) ([]byte, error) {
 	result := templateResult.Bytes()
 
 	return result, nil
+}
+
+func GetHTMLFilesFromDir(path string) []string {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		fmt.Printf("Error reading directory (GetHTMLFilesFromDir): %s\n", err)
+		return nil
+	}
+
+	var htmlFiles []string
+	for _, file := range files {
+		if !file.IsDir() && strings.HasSuffix(file.Name(), ".html") {
+			htmlFiles = append(htmlFiles, filepath.Join(path, file.Name()))
+		}
+	}
+
+	return htmlFiles
 }
