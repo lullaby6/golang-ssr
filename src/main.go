@@ -15,16 +15,21 @@ func main() {
 
 	router := gin.Default()
 
+	router.Use(utils.Cors("*", "POST,HEAD,PATCH,OPTIONS,GET,PUT"))
+
 	router.Static("/assets", "./src/assets")
 
 	router.GET("/", func(ctx *gin.Context) {
-		texts := []string{
-			"Text1",
-			"Text2",
-			"Text3",
+		texts := []map[string]interface{}{
+			{
+				"Text": "Hello",
+			},
+			{
+				"Text": "World",
+			},
 		}
 
-		textsComponent := utils.JoinStringWithCallback(texts, components.Text)
+		textsComponent := utils.JoinMapListWithCallback(texts, components.Text)
 
 		props := map[string]interface{}{
 			"Title":   "My Title",

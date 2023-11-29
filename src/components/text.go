@@ -4,11 +4,7 @@ import (
 	"main/src/utils"
 )
 
-func Text(text string) string {
-	props := map[string]interface{}{
-		"Text": text,
-	}
-
+func Text(props map[string]interface{}) string {
 	return utils.ParseString(`
 		<p>{{.Text}}</p>
 	`, props)
