@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"main/src/utils"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -15,8 +16,8 @@ func main() {
 
 	router := gin.Default()
 
-	pages := utils.GetHTMLFilesFromDir("./src/pages")
-	components := utils.GetHTMLFilesFromDir("./src/components")
+	pages := utils.GetFilesFromDirWithSuffix("./src/pages", ".html")
+	components := utils.GetFilesFromDirWithSuffix("./src/components", ".html")
 	files := append(pages, components...)
 	router.LoadHTMLFiles(files...)
 
@@ -50,13 +51,18 @@ func main() {
 	router.NoRoute(func(ctx *gin.Context) {
 		request := strings.Replace(ctx.Request.URL.Path, "/", "", 1)
 
-		for _, path := range pages {
-			file := strings.Replace(path, "src\\pages\\", "", 1)
-			if request+".html" == file {
-				ctx.Writer.WriteHeader(http.StatusOK)
-				ctx.File(path)
-				return
-			}
+		file := fmt.Sprintf("./src/pages/%s/index.html", request)
+		if _, err := os.Stat(file); err == nil {
+			ctx.Writer.WriteHeader(http.StatusOK)
+			ctx.File(file)
+			return
+		}
+
+		file = fmt.Sprintf("./src/pages/%s.html", request)
+		if _, err := os.Stat(file); err == nil {
+			ctx.Writer.WriteHeader(http.StatusOK)
+			ctx.File(file)
+			return
 		}
 
 		ctx.Writer.WriteHeader(http.StatusNotFound)
