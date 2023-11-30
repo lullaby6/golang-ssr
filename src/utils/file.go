@@ -8,18 +8,18 @@ import (
 )
 
 func GetFilesFromDirWithSuffix(dir string, suffix string) []string {
-	files, err := os.ReadDir(dir)
+	dirFiles, err := os.ReadDir(dir)
 	if err != nil {
 		fmt.Printf("Error reading directory (GetFilesFromDir): %s\n", err)
 		return nil
 	}
 
-	var htmlFiles []string
-	for _, file := range files {
+	var matchingFiles []string
+	for _, file := range dirFiles {
 		if !file.IsDir() && strings.HasSuffix(file.Name(), suffix) {
-			htmlFiles = append(htmlFiles, filepath.Join(dir, file.Name()))
+			matchingFiles = append(matchingFiles, filepath.Join(dir, file.Name()))
 		}
 	}
 
-	return htmlFiles
+	return matchingFiles
 }
